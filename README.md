@@ -7,7 +7,7 @@
 <a href="https://golang.org"><img src="https://img.shields.io/badge/Golang-1.16-red" alt="Go version 1.16"></a>
 <a href="https://echo.labstack.com"><img src="https://img.shields.io/badge/Echo Framework-v4-blue" alt="Echo Framework v4"></a>
 <a href="https://github.com/tucnak/telebot"><img src="https://img.shields.io/badge/Telebot Framework-v3-lightgrey" alt="Telebot Framework-v3"></a>
-<a href="https://github.com/assimon/epusdt/releases/tag/0.0.1"><img src="https://img.shields.io/badge/version-0.0.1-green" alt="version 0.0.1"></a>
+<a href="https://github.com/assimon/epusdt/releases/tag/v0.0.1"><img src="https://img.shields.io/badge/version-v0.0.1-green" alt="version v0.0.1"></a>
 </p>
 
 
