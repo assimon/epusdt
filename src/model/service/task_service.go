@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/util/http_client"
@@ -97,8 +98,9 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		}
 		x, _ := decimal.NewFromString(transfer.Quant)
 		y, _ := decimal.NewFromString("1000000")
-		quant := x.Div(y).String()
-		result, err := data.GetExpirationTimeByAmount(ctx, token, quant)
+		quant := x.Div(y).InexactFloat64()
+		amount := fmt.Sprintf("%.4f", quant)
+		result, err := data.GetExpirationTimeByAmount(ctx, token, amount)
 		if err != nil {
 			panic(err)
 		}
@@ -107,12 +109,12 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 			// 但是过期了
 			if expTime < nowTime {
 				// 删掉过期
-				_ = data.ClearPayCache(token, quant)
+				_ = data.ClearPayCache(token, amount)
 				continue
 			}
 		}
 		// 该钱包下有无匹配金额订单
-		tradeId, err := data.GetTradeIdByAmount(ctx, token, quant)
+		tradeId, err := data.GetTradeIdByAmount(ctx, token, amount)
 		if err != nil {
 			panic(err)
 		}
@@ -123,7 +125,7 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		req := &request.OrderProcessingRequest{
 			Token:              token,
 			TradeId:            tradeId,
-			Amount:             quant,
+			Amount:             amount,
 			BlockTransactionId: transfer.TransactionID,
 		}
 		err = OrderProcessing(req)
