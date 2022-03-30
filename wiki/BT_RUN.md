@@ -19,7 +19,7 @@
 
 ![导入Sql](img/sql.png)
 #### 2.使用phpMyAdmin导入
-```json
+```sql
 -- auto-generated definition
 create table orders
 (
