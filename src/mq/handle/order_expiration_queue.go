@@ -2,7 +2,6 @@ package handle
 
 import (
 	"context"
-	"fmt"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
 	"github.com/hibiken/asynq"
@@ -28,8 +27,7 @@ func OrderExpirationHandle(ctx context.Context, t *asynq.Task) error {
 	if err != nil {
 		return err
 	}
-	actualAmount := fmt.Sprintf("%.4f", orderInfo.ActualAmount)
-	err = data.ClearPayCache(orderInfo.Token, actualAmount)
+	err = data.UnLockTransaction(orderInfo.Token, orderInfo.ActualAmount)
 	if err != nil {
 		return err
 	}

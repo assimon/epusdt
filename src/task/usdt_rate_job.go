@@ -1,12 +1,11 @@
 package task
 
 import (
-	"fmt"
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/util/http_client"
 	"github.com/assimon/luuu/util/json"
 	"github.com/assimon/luuu/util/log"
-	"strconv"
+	"github.com/assimon/luuu/util/math"
 	"time"
 )
 
@@ -56,10 +55,7 @@ func (r UsdtRateJob) Run() {
 	}
 	for _, points := range usdtResp.Data.Points {
 		if len(points.C) > 0 && points.C[0] > 0 {
-			config.UsdtRate, err = strconv.ParseFloat(fmt.Sprintf("%.2f", points.C[0]), 64)
-			if err != nil {
-				log.Sugar.Error("Calculate UsdtRate err:", err.Error())
-			}
+			config.UsdtRate = math.MustParsePrecFloat64(points.C[0], 2)
 			return
 		}
 	}
