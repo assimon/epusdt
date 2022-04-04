@@ -8,11 +8,11 @@ import (
 	"github.com/assimon/luuu/model/request"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+	"time"
 )
 
 var (
-	CacheWalletAddressToAvailableAmountKey = "WalletAddressToAvailableAmountKey:" // 钱包 - 可用金额 - 过期时间
-	CacheWalletAddressToOrdersKey          = "WalletAddressToOrdersKey:"          // 钱包 - 待支付金额 - 订单号
+	CacheWalletAddressWithAmountToTradeIdKey = "wallet:%s_%v" // 钱包_待支付金额 : 交易号
 )
 
 // GetOrderInfoByOrderId 通过客户订单号查询订单
@@ -78,36 +78,11 @@ func UpdateOrderIsExpirationById(id uint64) error {
 	return err
 }
 
-// LockPayCache 锁定支付池
-func LockPayCache(token, tradeId, amount string, expirationTime int64) error {
-	// 载入Redis
+// GetTradeIdByWalletAddressAndAmount 通过钱包地址，支付金额获取交易号
+func GetTradeIdByWalletAddressAndAmount(token string, amount float64) (string, error) {
 	ctx := context.Background()
-	pipe := dao.Rdb.TxPipeline()
-	lockAvailableAmountKey := fmt.Sprintf("%s%s", CacheWalletAddressToAvailableAmountKey, token)
-	// 占用金额
-	pipe.HSet(ctx, lockAvailableAmountKey, amount, expirationTime)
-	// 标记金额对应订单号
-	lockWalletOrdersKey := fmt.Sprintf("%s%s", CacheWalletAddressToOrdersKey, token)
-	pipe.HSet(ctx, lockWalletOrdersKey, amount, tradeId)
-	_, err := pipe.Exec(ctx)
-	return err
-}
-
-// ClearPayCache 清理支付池
-func ClearPayCache(token, amount string) error {
-	ctx := context.Background()
-	lockAvailableAmountKey := fmt.Sprintf("%s%s", CacheWalletAddressToAvailableAmountKey, token)
-	lockWalletOrdersKey := fmt.Sprintf("%s%s", CacheWalletAddressToOrdersKey, token)
-	pipe := dao.Rdb.TxPipeline()
-	pipe.HDel(ctx, lockAvailableAmountKey, amount)
-	pipe.HDel(ctx, lockWalletOrdersKey, amount)
-	_, err := pipe.Exec(ctx)
-	return err
-}
-
-func GetTradeIdByAmount(ctx context.Context, token, amount string) (string, error) {
-	cacheKey := fmt.Sprintf("%s%s", CacheWalletAddressToOrdersKey, token)
-	result, err := dao.Rdb.HGet(ctx, cacheKey, amount).Result()
+	cacheKey := fmt.Sprintf(CacheWalletAddressWithAmountToTradeIdKey, token, amount)
+	result, err := dao.Rdb.Get(ctx, cacheKey).Result()
 	if err == redis.Nil {
 		return "", nil
 	}
@@ -117,14 +92,18 @@ func GetTradeIdByAmount(ctx context.Context, token, amount string) (string, erro
 	return result, nil
 }
 
-func GetExpirationTimeByAmount(ctx context.Context, token, amount string) (string, error) {
-	cacheKey := fmt.Sprintf("%s%s", CacheWalletAddressToAvailableAmountKey, token)
-	result, err := dao.Rdb.HGet(ctx, cacheKey, amount).Result()
-	if err == redis.Nil {
-		return "", nil
-	}
-	if err != nil {
-		return "", err
-	}
-	return result, nil
+// LockTransaction 锁定交易
+func LockTransaction(token, tradeId string, amount float64, expirationTime time.Duration) error {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf(CacheWalletAddressWithAmountToTradeIdKey, token, amount)
+	err := dao.Rdb.Set(ctx, cacheKey, tradeId, expirationTime).Err()
+	return err
+}
+
+// UnLockTransaction 解锁交易
+func UnLockTransaction(token string, amount float64) error {
+	ctx := context.Background()
+	cacheKey := fmt.Sprintf(CacheWalletAddressWithAmountToTradeIdKey, token, amount)
+	err := dao.Rdb.Del(ctx, cacheKey).Err()
+	return err
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"os"
+	"time"
 )
 
 var (
@@ -53,7 +54,7 @@ func Init() {
 }
 
 func GetAppVersion() string {
-	return "0.0.1"
+	return "0.0.2"
 }
 
 func GetAppName() string {
@@ -89,4 +90,9 @@ func GetOrderExpirationTime() int {
 		return 10
 	}
 	return timer
+}
+
+func GetOrderExpirationTimeDuration() time.Duration {
+	timer := GetOrderExpirationTime()
+	return time.Minute * time.Duration(timer)
 }

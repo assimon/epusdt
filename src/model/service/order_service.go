@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/dao"
@@ -11,16 +10,21 @@ import (
 	"github.com/assimon/luuu/model/response"
 	"github.com/assimon/luuu/mq"
 	"github.com/assimon/luuu/mq/handle"
-	"github.com/assimon/luuu/telegram"
 	"github.com/assimon/luuu/util/constant"
+	"github.com/assimon/luuu/util/math"
 	"github.com/golang-module/carbon/v2"
-	"github.com/gookit/goutil/mathutil"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
 	"math/rand"
-	"strconv"
 	"sync"
 	"time"
+)
+
+const (
+	CnyMinimumPaymentAmount  = 0.01  // cny最低支付金额
+	UsdtMinimumPaymentAmount = 0.001 // usdt最低支付金额
+	UsdtAmountPerIncrement   = 0.001 // usdt每次递增金额
+	IncrementalMaximumNumber = 100   // 最大递增次数
 )
 
 var gCreateTransactionLock sync.Mutex
@@ -29,17 +33,17 @@ var gCreateTransactionLock sync.Mutex
 func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateTransactionResponse, error) {
 	gCreateTransactionLock.Lock()
 	defer gCreateTransactionLock.Unlock()
-	// 汇率计算金额
-	rmb := decimal.NewFromFloat(req.Amount)
-	rate := decimal.NewFromFloat(config.GetUsdtRate())
-	amount := rmb.Div(rate).InexactFloat64()
-	actualAmountStr := fmt.Sprintf("%.4f", amount)
-	actualAmountFloat, err := strconv.ParseFloat(actualAmountStr, 64)
-	if err != nil {
-		return nil, err
+	payAmount := math.MustParsePrecFloat64(req.Amount, 2)
+	// 按照汇率转化USDT
+	decimalPayAmount := decimal.NewFromFloat(payAmount)
+	decimalRate := decimal.NewFromFloat(config.GetUsdtRate())
+	decimalUsdt := decimalPayAmount.Div(decimalRate)
+	// cny 是否可以满足最低支付金额
+	if decimalPayAmount.Cmp(decimal.NewFromFloat(CnyMinimumPaymentAmount)) == -1 {
+		return nil, constant.PayAmountErr
 	}
-	// 是否可以满足最低支付金额
-	if actualAmountFloat <= 0 {
+	// Usdt是否可以满足最低支付金额
+	if decimalUsdt.Cmp(decimal.NewFromFloat(UsdtMinimumPaymentAmount)) == -1 {
 		return nil, constant.PayAmountErr
 	}
 	// 已经存在了的交易
@@ -58,23 +62,20 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 	if len(walletAddress) <= 0 {
 		return nil, constant.NotAvailableWalletAddress
 	}
-	availableToken, availableAmountStr, err := CalculateAvailableWalletTokenAndAmount(actualAmountStr, walletAddress)
+	amount := math.MustParsePrecFloat64(decimalUsdt.InexactFloat64(), 3)
+	availableToken, availableAmount, err := CalculateAvailableWalletAndAmount(amount, walletAddress)
 	if err != nil {
 		return nil, err
 	}
-	if availableToken == "" || availableAmountStr == "" {
+	if availableToken == "" {
 		return nil, constant.NotAvailableAmountErr
-	}
-	availableAmountFloat, err := strconv.ParseFloat(availableAmountStr, 64)
-	if err != nil {
-		return nil, err
 	}
 	tx := dao.Mdb.Begin()
 	order := &mdb.Orders{
 		TradeId:      GenerateCode(),
 		OrderId:      req.OrderId,
 		Amount:       req.Amount,
-		ActualAmount: availableAmountFloat,
+		ActualAmount: availableAmount,
 		Token:        availableToken,
 		Status:       mdb.StatusWaitPay,
 		NotifyUrl:    req.NotifyUrl,
@@ -85,9 +86,8 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 		tx.Rollback()
 		return nil, err
 	}
-	ExpirationTime := carbon.Now().AddMinutes(config.GetOrderExpirationTime()).Timestamp()
 	// 锁定支付池
-	err = data.LockPayCache(availableToken, order.TradeId, availableAmountStr, ExpirationTime)
+	err = data.LockTransaction(availableToken, order.TradeId, availableAmount, config.GetOrderExpirationTimeDuration())
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -95,7 +95,8 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 	tx.Commit()
 	// 超时过期消息队列
 	orderExpirationQueue, _ := handle.NewOrderExpirationQueue(order.TradeId)
-	mq.MClient.Enqueue(orderExpirationQueue, asynq.ProcessIn(time.Minute*time.Duration(config.GetOrderExpirationTime())))
+	mq.MClient.Enqueue(orderExpirationQueue, asynq.ProcessIn(config.GetOrderExpirationTimeDuration()))
+	ExpirationTime := carbon.Now().AddMinutes(config.GetOrderExpirationTime()).Timestamp()
 	resp := &response.CreateTransactionResponse{
 		TradeId:        order.TradeId,
 		OrderId:        order.OrderId,
@@ -125,88 +126,51 @@ func OrderProcessing(req *request.OrderProcessingRequest) error {
 		tx.Rollback()
 		return err
 	}
-	err = data.ClearPayCache(req.Token, req.Amount)
-	tx.Commit()
-	order, err := data.GetOrderInfoByTradeId(req.TradeId)
+	// 解锁交易
+	err = data.UnLockTransaction(req.Token, req.Amount)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
-	// 回调队列
-	orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
-	mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
-	// 发送机器人消息
-	msgTpl := `
-<b>📢📢有新的交易支付成功！</b>
-<pre>交易号：%s</pre>
-<pre>订单号：%s</pre>
-<pre>请求支付金额：%.4f cny</pre>
-<pre>实际支付金额：%.4f usdt</pre>
-<pre>钱包地址：%s</pre>
-<pre>订单创建时间：%s</pre>
-<pre>支付成功时间：%s</pre>
-`
-	msg := fmt.Sprintf(msgTpl, order.TradeId, order.OrderId, order.Amount, order.ActualAmount, order.Token, order.CreatedAt.ToDateTimeString(), carbon.Now().ToDateTimeString())
-	telegram.SendToBot(msg)
+	tx.Commit()
 	return nil
 }
 
-func CalculateAvailableWalletTokenAndAmount(amount string, walletAddress []mdb.WalletAddress) (string, string, error) {
-	calculateAmountStr := amount
-	availableAmountStr := ""
+// CalculateAvailableWalletAndAmount 计算可用钱包地址和金额
+func CalculateAvailableWalletAndAmount(amount float64, walletAddress []mdb.WalletAddress) (string, float64, error) {
 	availableToken := ""
-	for i := 0; i < 100; i++ {
-		token, err := CalculateAvailableWalletToken(calculateAmountStr, walletAddress)
-		if err != nil {
-			return "", "", err
+	availableAmount := amount
+	calculateAvailableWalletFunc := func(amount float64) (string, error) {
+		availableWallet := ""
+		for _, address := range walletAddress {
+			token := address.Token
+			result, err := data.GetTradeIdByWalletAddressAndAmount(token, amount)
+			if err != nil {
+				return "", err
+			}
+			if result == "" {
+				availableWallet = token
+				break
+			}
 		}
-		// 这个金额没有拿到可用的钱包，重试，金额+0.0001
+		return availableWallet, nil
+	}
+	for i := 0; i < IncrementalMaximumNumber; i++ {
+		token, err := calculateAvailableWalletFunc(availableAmount)
+		if err != nil {
+			return "", 0, err
+		}
+		// 拿不到可用钱包就累加金额
 		if token == "" {
-			x, err := decimal.NewFromString(calculateAmountStr)
-			if err != nil {
-				return "", "", err
-			}
-			y, err := decimal.NewFromString("0.0001")
-			if err != nil {
-				return "", "", err
-			}
-			calculateAmountStr = x.Add(y).String()
+			decimalOldAmount := decimal.NewFromFloat(availableAmount)
+			decimalIncr := decimal.NewFromFloat(UsdtAmountPerIncrement)
+			availableAmount = decimalOldAmount.Add(decimalIncr).InexactFloat64()
 			continue
 		}
-		availableAmountStr = calculateAmountStr
 		availableToken = token
 		break
 	}
-	return availableToken, availableAmountStr, nil
-}
-
-// CalculateAvailableWalletToken 计算可用钱包token
-func CalculateAvailableWalletToken(payAmount string, walletAddress []mdb.WalletAddress) (string, error) {
-	nowTime := time.Now().Unix()
-	ctx := context.Background()
-	walletToken := ""
-	for _, address := range walletAddress {
-		result, err := data.GetExpirationTimeByAmount(ctx, address.Token, payAmount)
-		if err != nil {
-			return "", err
-		}
-		// 这个钱包金额被占用了
-		if result != "" {
-			endTime := mathutil.MustInt64(result)
-			// 但是过期了
-			if endTime < nowTime {
-				// 删掉过期，还能继续用这个地址
-				err = data.ClearPayCache(address.Token, payAmount)
-				if err != nil {
-					return "", err
-				}
-			} else {
-				continue
-			}
-		}
-		walletToken = address.Token
-		break
-	}
-	return walletToken, nil
+	return availableToken, availableAmount, nil
 }
 
 // GenerateCode 订单号生成
