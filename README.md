@@ -40,6 +40,7 @@ Epusdt
 ## 教程：
 - 宝塔运行`epusdt`教程👉🏻[宝塔运行epusdt](wiki/BT_RUN.md)
 - 开发者接入`epusdt`文档👉🏻[开发者接入epusdt](wiki/API.md)
+- HTML+PHP极速运行`epusdt`教程👉🏻[使用PHPAPI-for-epusdt极速接入epusdt](https://github.com/BlueSkyXN/PHPAPI-for-epusdt)
 
 ## 已适配系统插件
 - 独角数卡[插件地址](plugins/dujiaoka)
