@@ -15,8 +15,8 @@ builds:
       - windows
     goarch:
       - amd64
-      #- arm
-      #- 386
+      - arm
+      - 386
 archives:
   - replacements:
       darwin: Darwin
@@ -25,7 +25,7 @@ archives:
       386: i386
       amd64: x86_64
     id: epusdt
-    name_template: "{{ .ProjectName }}_v0.0.1_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_v0.0.2_{{ .Os }}_{{ .Arch }}"
     format: tar.gz
     files:
       - .env.example
