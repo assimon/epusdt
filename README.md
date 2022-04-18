@@ -39,6 +39,7 @@ Epusdt
 
 ## 教程：
 - 宝塔运行`epusdt`教程👉🏻[宝塔运行epusdt](wiki/BT_RUN.md)
+- 不好意思我有洁癖，手动运行`epusdt`教程👉🏻[手动运行epusdt](wiki/manual_RUN.md)
 - 开发者接入`epusdt`文档👉🏻[开发者接入epusdt](wiki/API.md)
 - HTML+PHP极速运行`epusdt`教程👉🏻[使用PHPAPI-for-epusdt极速接入epusdt](https://github.com/BlueSkyXN/PHPAPI-for-epusdt)
 
