@@ -46,6 +46,9 @@ Epusdt
 ## 已适配系统插件
 - 独角数卡[插件地址](plugins/dujiaoka)
 
+## 🔥推荐服务器
+- （美国免备案vps，配置3核3G仅需`24.28$`≈`159RMB`一年支持支付宝付款）[👉🏻点我直达](https://my.racknerd.com/aff.php?aff=2745&pid=199)
+
 ## 加入交流/意见反馈
 - `Epusdt`频道[https://t.me/epusdt](https://t.me/epusdt)
 - `Epusdt`交流群组[https://t.me/epusdt_group](https://t.me/epusdt_group)
