@@ -181,6 +181,7 @@
     let second = Math.round(ms / 1000);
     let minute = Math.floor(second / 60);
     let hour = Math.floor(minute / 60);
+    if(minute > 60) minute %= 60
     if (ms <= 0) {
       layer.alert("支付超时，请重新发起支付！", {icon: 5});
       return;
