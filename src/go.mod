@@ -6,6 +6,8 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang-module/carbon/v2 v2.0.1
+	github.com/google/btree v1.0.0 // indirect
+	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gookit/color v1.5.0
 	github.com/gookit/goutil v0.4.6
@@ -13,6 +15,7 @@ require (
 	github.com/hibiken/asynq v0.23.0
 	github.com/json-iterator/go v1.1.12
 	github.com/labstack/echo/v4 v4.6.0
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/satori/go.uuid v1.2.0
