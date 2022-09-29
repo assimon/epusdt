@@ -73,7 +73,7 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 	endTime := carbon.Now().TimestampWithMillisecond()
 	resp, err := client.R().SetQueryParams(map[string]string{
 		"sort":            "-timestamp",
-		"limit":           "500",
+		"limit":           "50",
 		"start":           "0",
 		"direction":       "2",
 		"db_version":      "1",
