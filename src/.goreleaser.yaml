@@ -1,5 +1,6 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
+project_name: epusdt
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -25,7 +26,7 @@ archives:
       386: i386
       amd64: x86_64
     id: epusdt
-    name_template: "{{ .ProjectName }}_v0.0.1_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     format: tar.gz
     files:
       - .env.example
