@@ -7,6 +7,6 @@ func Start() {
 	// 汇率监听
 	c.AddJob("@every 60s", UsdtRateJob{})
 	// trc20钱包监听
-	c.AddJob("@every 10s", ListenTrc20Job{})
+	c.AddJob("@every 5s", ListenTrc20Job{})
 	c.Start()
 }
