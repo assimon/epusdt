@@ -21,10 +21,10 @@ import (
 )
 
 const (
-	CnyMinimumPaymentAmount  = 0.01  // cny最低支付金额
-	UsdtMinimumPaymentAmount = 0.001 // usdt最低支付金额
-	UsdtAmountPerIncrement   = 0.001 // usdt每次递增金额
-	IncrementalMaximumNumber = 100   // 最大递增次数
+	CnyMinimumPaymentAmount  = 0.01 // cny最低支付金额
+	UsdtMinimumPaymentAmount = 0.01 // usdt最低支付金额
+	UsdtAmountPerIncrement   = 0.01 // usdt每次递增金额
+	IncrementalMaximumNumber = 100  // 最大递增次数
 )
 
 var gCreateTransactionLock sync.Mutex
@@ -62,7 +62,7 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 	if len(walletAddress) <= 0 {
 		return nil, constant.NotAvailableWalletAddress
 	}
-	amount := math.MustParsePrecFloat64(decimalUsdt.InexactFloat64(), 3)
+	amount := math.MustParsePrecFloat64(decimalUsdt.InexactFloat64(), 2)
 	availableToken, availableAmount, err := CalculateAvailableWalletAndAmount(amount, walletAddress)
 	if err != nil {
 		return nil, err
