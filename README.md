@@ -49,6 +49,9 @@ Epusdt
 ## 🔥推荐服务器 
 - （美国免备案vps，配置2核2G仅需`20.98$`≈`145RMB`一年/支持支付宝付款）[👉🏻点我直达](https://my.racknerd.com/aff.php?aff=2745&pid=681)
 
+## 💰USDT虚拟信用卡，可绑定支付宝美团消费
+- 推荐码`692111`[💳点我开户](https://depay.depay.one/web-app/register-h5?invitCode=692111&lang=zh-cn)
+
 ## 加入交流/意见反馈
 - `Epusdt`频道[https://t.me/epusdt](https://t.me/epusdt)
 - `Epusdt`交流群组[https://t.me/epusdt_group](https://t.me/epusdt_group)
