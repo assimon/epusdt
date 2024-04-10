@@ -42,7 +42,6 @@ mysql_max_idle_conns=10
 mysql_max_open_conns=100
 mysql_max_life_time=6
 
-
 # redis配置
 redis_host=127.0.0.1
 redis_port=6379
