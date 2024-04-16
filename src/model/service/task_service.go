@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/spf13/viper"
+
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/mq"
@@ -135,7 +137,6 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 			panic(err)
 		}
 		// 回调队列
-		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
 		orderNoticeMaxRetry := viper.GetInt("order_notice_max_retry")
 		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(orderNoticeMaxRetry))
