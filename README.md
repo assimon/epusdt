@@ -46,6 +46,9 @@ Epusdt
 ## 已适配系统插件
 - 独角数卡[插件地址](plugins/dujiaoka)
 
+## 💳推荐U卡 
+- （香港万事达U卡,可绑定支付宝/微信/谷歌云/腾讯云/阿里云/狗爹/ATM取现）[👉🏻点我直达](https://www.thpay.org/?channelCode=2297074)
+
 ## 🔥推荐服务器 
 - （美国免备案vps，配置2核2G仅需`20.98$`≈`145RMB`一年/支持支付宝付款）[👉🏻点我直达](https://my.racknerd.com/aff.php?aff=2745&pid=681)
 
