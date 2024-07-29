@@ -5,23 +5,10 @@ services:
     restart: always
     # build: 
     #   context: .
-    #   dockerfile: Dockerfile_alpine
+    #   dockerfile: Dockerfile
     volumes:
       - ./env:/app/.env
     ports:
       - "8088:8000"
-  mydb:
-    image: "mariadb:10.5"
-    container_name: "mydb"
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=root_password
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=db_user
-      - MYSQL_PASSWORD=db_password
-    ports:
-      - "3306:3306"
-    # networks:
-    #   - app_myphp_fpm
-    volumes:
-      - ./data_db/database:/var/lib/mysql
+    #volumes:
+    #  - ./data_db/conf:/app/conf/
