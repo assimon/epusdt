@@ -14,6 +14,8 @@ func DBInit() {
 	dbType := viper.GetString("db_type")
 	if strings.EqualFold(dbType, "postgres") {
 		PostgreSQLInit()
+	} else if strings.EqualFold(dbType, "sqlite") {
+		SqliteInit()
 	} else {
 		MysqlInit()
 	}

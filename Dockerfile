@@ -1,10 +1,10 @@
 FROM golang:alpine as builder
 
-# ENV CGO_ENABLED=1
+RUN apk add --no-cache --update git build-base
+ENV CGO_ENABLED=1
 WORKDIR /app
 
 COPY ./src .
-# RUN apk add --no-cache --update git build-base
 RUN  go mod tidy \
 	&& go build -ldflags "-s -w"  \
 	-o epusdt .
@@ -14,7 +14,6 @@ ENV TZ=Asia/Shanghai
 RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /app
-
 COPY --from=builder /app/static /app/static
 COPY --from=builder /app/static /static
 COPY --from=builder /app/epusdt .

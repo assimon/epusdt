@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile_alpine
+          file: ./Dockerfile
           push: true
           tags: |            
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:alpine
