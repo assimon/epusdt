@@ -1,6 +1,8 @@
 package dao
 
 import (
+	"path/filepath"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/util/log"
 	"github.com/gookit/color"
@@ -14,11 +16,12 @@ import (
 // SqliteInit 数据库初始化
 func SqliteInit() {
 	var err error
-	dbname := viper.GetString("sqlite_database_filename")
-	if len(dbname) == 0 {
-		dbname = ".db"
+	dbFilename := ".db"
+	if dbfile := viper.GetString("sqlite_database_filename"); len(dbfile) > 0 {
+		dbFilename = filepath.Base(dbfile)
 	}
-	Mdb, err = gorm.Open(sqlite.Open(dbname), &gorm.Config{
+	color.Green.Printf("[store_db] sqlite filename: %s\n", dbFilename)
+	Mdb, err = gorm.Open(sqlite.Open(dbFilename), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   viper.GetString("sqlite_table_prefix"),
 			SingularTable: true,

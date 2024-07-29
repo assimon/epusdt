@@ -10,5 +10,3 @@ services:
       - ./env:/app/.env
     ports:
       - "8088:8000"
-    #volumes:
-    #  - ./data_db/conf:/app/conf/
