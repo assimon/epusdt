@@ -3,11 +3,12 @@ package dao
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/assimon/luuu/util/log"
 	"github.com/go-redis/redis/v8"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
-	"time"
 )
 
 var Rdb *redis.Client
@@ -34,7 +35,10 @@ func RedisInit() {
 		log.Sugar.Debug("[store_redis] Nil reply returned by Rdb when key does not exist.")
 	} else if err != nil {
 		color.Red.Printf("[store_redis] redis connRdb err,err=%s", err)
-		panic(err)
+		// panic(err)
+		time.Sleep(10 * time.Second)
+		RedisInit()
+		return
 	} else {
 		log.Sugar.Debug("[store_redis] redis connRdb success,suc=%s", pong)
 	}

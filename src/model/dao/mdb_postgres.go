@@ -8,7 +8,6 @@ import (
 	"github.com/assimon/luuu/util/log"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -36,7 +35,11 @@ func PostgreSQLInit() {
 		},
 	)
 	if err != nil {
-		panic(err)
+		color.Red.Printf("[store_db] postgres open DB,err=%s\n", err)
+		// panic(err)
+		time.Sleep(10 * time.Second)
+		PostgreSQLInit()
+		return
 	}
 
 	if config.AppDebug {
@@ -45,7 +48,10 @@ func PostgreSQLInit() {
 	sqlDB, err := Mdb.DB()
 	if err != nil {
 		color.Red.Printf("[store_db] postgres get DB,err=%s\n", err)
-		panic(err)
+		// panic(err)
+		time.Sleep(10 * time.Second)
+		PostgreSQLInit()
+		return
 	}
 	sqlDB.SetMaxIdleConns(viper.GetInt("postgres_max_idle_conns"))
 	sqlDB.SetMaxOpenConns(viper.GetInt("postgres_max_open_conns"))
@@ -53,7 +59,10 @@ func PostgreSQLInit() {
 	err = sqlDB.Ping()
 	if err != nil {
 		color.Red.Printf("[store_db] postgres connDB err:%s", err.Error())
-		panic(err)
+		// panic(err)
+		time.Sleep(10 * time.Second)
+		PostgreSQLInit()
+		return
 	}
 	log.Sugar.Debug("[store_db] postgres connDB success")
 }
