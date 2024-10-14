@@ -13,7 +13,7 @@ import (
 
 var Rdb *redis.Client
 
-func RedisInit() {
+func RedisInit() error {
 	options := redis.Options{
 		Addr: fmt.Sprintf(
 			"%s:%s",
@@ -36,10 +36,11 @@ func RedisInit() {
 	} else if err != nil {
 		color.Red.Printf("[store_redis] redis connRdb err,err=%s", err)
 		// panic(err)
-		time.Sleep(10 * time.Second)
-		RedisInit()
-		return
+		// time.Sleep(10 * time.Second)
+		// RedisInit()
+		return err
 	} else {
 		log.Sugar.Debug("[store_redis] redis connRdb success,suc=%s", pong)
 	}
+	return nil
 }

@@ -15,7 +15,7 @@ import (
 )
 
 // PostgreSQLInit 数据库初始化
-func PostgreSQLInit() {
+func PostgreSQLInit() error {
 	var err error
 	user := viper.GetString("postgres_user")
 	pass := viper.GetString("postgres_passwd")
@@ -37,9 +37,7 @@ func PostgreSQLInit() {
 	if err != nil {
 		color.Red.Printf("[store_db] postgres open DB,err=%s\n", err)
 		// panic(err)
-		time.Sleep(10 * time.Second)
-		PostgreSQLInit()
-		return
+		return err
 	}
 
 	if config.AppDebug {
@@ -49,9 +47,7 @@ func PostgreSQLInit() {
 	if err != nil {
 		color.Red.Printf("[store_db] postgres get DB,err=%s\n", err)
 		// panic(err)
-		time.Sleep(10 * time.Second)
-		PostgreSQLInit()
-		return
+		return err
 	}
 	sqlDB.SetMaxIdleConns(viper.GetInt("postgres_max_idle_conns"))
 	sqlDB.SetMaxOpenConns(viper.GetInt("postgres_max_open_conns"))
@@ -60,9 +56,8 @@ func PostgreSQLInit() {
 	if err != nil {
 		color.Red.Printf("[store_db] postgres connDB err:%s", err.Error())
 		// panic(err)
-		time.Sleep(10 * time.Second)
-		PostgreSQLInit()
-		return
+		return err
 	}
 	log.Sugar.Debug("[store_db] postgres connDB success")
+	return nil
 }

@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM golang:alpine AS builder
 
 RUN apk add --no-cache --update git build-base
 ENV CGO_ENABLED=1
@@ -9,7 +9,7 @@ RUN  go mod tidy \
 	&& go build -ldflags "-s -w"  \
 	-o epusdt .
 
-FROM alpine:latest as runner
+FROM alpine:latest AS runner
 ENV TZ=Asia/Shanghai
 RUN apk --no-cache add ca-certificates tzdata
 

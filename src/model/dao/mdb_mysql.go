@@ -15,7 +15,7 @@ import (
 )
 
 // MysqlInit 数据库初始化
-func MysqlInit() {
+func MysqlInit() error {
 	var err error
 	Mdb, err = gorm.Open(mysql.Open(config.MysqlDns), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -27,9 +27,7 @@ func MysqlInit() {
 	if err != nil {
 		color.Red.Printf("[store_db] mysql open DB,err=%s\n", err)
 		// panic(err)
-		time.Sleep(10 * time.Second)
-		MysqlInit()
-		return
+		return err
 	}
 	if config.AppDebug {
 		Mdb = Mdb.Debug()
@@ -40,7 +38,7 @@ func MysqlInit() {
 		// panic(err)
 		time.Sleep(10 * time.Second)
 		MysqlInit()
-		return
+		return err
 	}
 	sqlDB.SetMaxIdleConns(viper.GetInt("mysql_max_idle_conns"))
 	sqlDB.SetMaxOpenConns(viper.GetInt("mysql_max_open_conns"))
@@ -51,7 +49,8 @@ func MysqlInit() {
 		// panic(err)
 		time.Sleep(10 * time.Second)
 		MysqlInit()
-		return
+		return err
 	}
 	log.Sugar.Debug("[store_db] mysql connDB success")
+	return nil
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/assimon/luuu/util/log"
 	"github.com/gookit/color"
 	"github.com/spf13/viper"
+
+	// "github.com/glebarez/sqlite"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -14,7 +16,7 @@ import (
 )
 
 // SqliteInit 数据库初始化
-func SqliteInit() {
+func SqliteInit() error {
 	var err error
 	dbFilename := ".db"
 	if dbfile := viper.GetString("sqlite_database_filename"); len(dbfile) > 0 {
@@ -29,7 +31,9 @@ func SqliteInit() {
 		Logger: logger.Default.LogMode(logger.Error),
 	})
 	if err != nil {
-		panic(err)
+		color.Red.Printf("[store_db] sqlite open DB,err=%s\n", err)
+		// panic(err)
+		return err
 	}
 	if config.AppDebug {
 		Mdb = Mdb.Debug()
@@ -37,7 +41,8 @@ func SqliteInit() {
 	sqlDB, err := Mdb.DB()
 	if err != nil {
 		color.Red.Printf("[store_db] sqlite get DB,err=%s\n", err)
-		panic(err)
+		// panic(err)
+		return err
 	}
 	// sqlDB.SetMaxIdleConns(viper.GetInt("sqlite_max_idle_conns"))
 	// sqlDB.SetMaxOpenConns(viper.GetInt("sqlite_max_open_conns"))
@@ -45,7 +50,9 @@ func SqliteInit() {
 	err = sqlDB.Ping()
 	if err != nil {
 		color.Red.Printf("[store_db] sqlite connDB err:%s", err.Error())
-		panic(err)
+		// panic(err)
+		return err
 	}
 	log.Sugar.Debug("[store_db] sqlite connDB success")
+	return nil
 }
