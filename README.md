@@ -10,6 +10,12 @@
 <a href="https://github.com/assimon/epusdt/releases/tag/v0.0.1"><img src="https://img.shields.io/badge/version-v0.0.1-green" alt="version v0.0.1"></a>
 </p>
 
+## 👮‍♂️反诈提醒
+近期有高仿作者telegram实施诈骗的行为，        
+请各位用户擦亮双眼，作者从不私聊任何人提供任何收费形式的技术支持服务！    
+项目是完全开源免费的，完全遵守`MIT开源协议`    
+没有所谓的`技术支持`，`终身技术支持`，`二次开发`等业务，也不参与任何用户的`业务运营`。    
+凡是作者私聊你的全是高仿号诈骗，请仔细核对作者唯一Telegram用户名：`linux0101`!   
 
 ## 项目简介
 `Epusdt`（全称：Easy Payment Usdt）是一个由`Go语言`编写的私有化部署`Usdt`支付中间件(`Trc20网络`)     
