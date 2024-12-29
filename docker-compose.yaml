@@ -1,0 +1,12 @@
+version: "3"
+services:
+  epusdt:
+    image:  annona/epusdt:alpine
+    restart: always
+    # build: 
+    #   context: .
+    #   dockerfile: Dockerfile
+    volumes:
+      - ./env:/app/.env
+    ports:
+      - "8088:8000"
