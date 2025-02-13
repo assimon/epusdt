@@ -17,6 +17,5 @@ WORKDIR /app
 COPY --from=builder /app/static /app/static
 COPY --from=builder /app/static /static
 COPY --from=builder /app/epusdt .
-EXPOSE 8000
 
 ENTRYPOINT ["./epusdt" ,"http","start"]
