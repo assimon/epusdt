@@ -18,7 +18,7 @@ import (
 // SqliteInit 数据库初始化
 func SqliteInit() error {
 	var err error
-	dbFilename := ".db"
+	dbFilename := "./conf/.db"
 	if dbfile := viper.GetString("sqlite_database_filename"); len(dbfile) > 0 {
 		dbFilename = filepath.Base(dbfile)
 	}
