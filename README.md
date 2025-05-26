@@ -54,7 +54,7 @@ Epusdt
 
 
 ## 🔥推荐服务器 
-- （美国免备案vps，配置2核2G仅需`20.98$`≈`145RMB`一年/支持支付宝付款）[👉🏻点我直达](https://my.racknerd.com/aff.php?aff=2745&pid=681)
+- （香港三网(电信/移动/联通)直连优化VPS，CN2优化网络大带宽低至35RMB/每月）[👉🏻点我直达](https://www.vkvm.info/cart?action=configureproduct&pid=146&aff=ECRPONNJ)
 
 ## 加入交流/意见反馈
 - `Epusdt`频道[https://t.me/epusdt](https://t.me/epusdt)
