@@ -14,8 +14,9 @@ var bots *tb.Bot
 func BotStart() {
 	var err error
 	botSetting := tb.Settings{
-		Token:  config.TgBotToken,
-		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
+		Token:       config.TgBotToken,
+		Poller:      &tb.LongPoller{Timeout: 50 * time.Second},
+		Synchronous: true,
 	}
 	if config.TgProxy != "" {
 		botSetting.URL = config.TgProxy
