@@ -1,15 +1,3 @@
-# 分支说明
-
-此为自动打包docker版本
-
-## 新增 
-1. 支持postgres/sqlite数据库  
-2. 支持设置`订单回调失败自动重试次数`
-
-## 使用方法
-配置好`.env`文件后，使用 `docker-compose up -d` 启动镜像
-
-
 ## Epusdt (Easy Payment Usdt)
 <p align="center">
 <img src="wiki/img/usdtlogo.png">
