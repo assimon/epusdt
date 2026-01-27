@@ -8,9 +8,9 @@ cd /var/www/
 mkdir epusdt
 chmod 777 -R /var/www/epusdt
 cd epusdt
-wget  wget https://github.com/assimon/epusdt/releases/download/v0.0.3/epusdt_0.0.3_Linux_x86_64.tar.gz
+wget https://github.com/assimon/epusdt/releases/download/v0.0.3/epusdt_0.0.3_Linux_x86_64.tar.gz
 tar -xzf epusdt_0.0.3_Linux_x86_64.tar.gz
-rm rm epusdt_0.0.3_Linux_x86_64.tar.gz
+rm epusdt_0.0.3_Linux_x86_64.tar.gz
 ```
 ## 2.导入Sql
 - 创建sql文件
