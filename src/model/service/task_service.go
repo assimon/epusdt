@@ -2,6 +2,11 @@ package service
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
+
+	"github.com/spf13/viper"
+
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/request"
 	"github.com/assimon/luuu/mq"
@@ -10,12 +15,10 @@ import (
 	"github.com/assimon/luuu/util/http_client"
 	"github.com/assimon/luuu/util/json"
 	"github.com/assimon/luuu/util/log"
-	"github.com/golang-module/carbon/v2"
+	"github.com/dromara/carbon/v2"
 	"github.com/gookit/goutil/stdutil"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
-	"net/http"
-	"sync"
 )
 
 const UsdtTrc20ApiUri = "https://apilist.tronscanapi.com/api/transfer/trc20"
@@ -69,8 +72,8 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		}
 	}()
 	client := http_client.GetHttpClient()
-	startTime := carbon.Now().AddHours(-24).TimestampWithMillisecond()
-	endTime := carbon.Now().TimestampWithMillisecond()
+	startTime := carbon.Now().AddHours(-24).TimestampMilli()
+	endTime := carbon.Now().TimestampMilli()
 	resp, err := client.R().SetQueryParams(map[string]string{
 		"sort":            "-timestamp",
 		"limit":           "50",
@@ -118,7 +121,7 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 			panic(err)
 		}
 		// 区块的确认时间必须在订单创建时间之后
-		createTime := order.CreatedAt.TimestampWithMillisecond()
+		createTime := order.CreatedAt.TimestampMilli()
 		if transfer.BlockTimestamp < createTime {
 			panic("Orders cannot actually be matched")
 		}
@@ -135,7 +138,9 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		}
 		// 回调队列
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
-		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
+		orderNoticeMaxRetry := viper.GetInt("order_notice_max_retry")
+		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(orderNoticeMaxRetry))
+		// mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
 		// 发送机器人消息
 		msgTpl := `
 <b>📢📢有新的交易支付成功！</b>

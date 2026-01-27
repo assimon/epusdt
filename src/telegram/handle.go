@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
 	"github.com/gookit/goutil/mathutil"
@@ -16,11 +17,16 @@ const (
 func OnTextMessageHandle(c tb.Context) error {
 	if c.Message().ReplyTo.Text == ReplayAddWallet {
 		defer bots.Delete(c.Message().ReplyTo)
-		_, err := data.AddWalletAddress(c.Message().Text)
+		msgText := c.Message().Text
+		if !isValidTronAddress(msgText) {
+			_ = c.Send(fmt.Sprintf("钱包[%s]添加失败: 非Tron地址！", msgText))
+			return nil
+		}
+		_, err := data.AddWalletAddress(msgText)
 		if err != nil {
 			return c.Send(err.Error())
 		}
-		c.Send(fmt.Sprintf("钱包[%s]添加成功！", c.Message().Text))
+		_ = c.Send(fmt.Sprintf("钱包[%s]添加成功！", msgText))
 		return WalletList(c)
 	}
 	return nil

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
@@ -21,7 +22,7 @@ func GetCheckoutCounterByTradeId(tradeId string) (*response.CheckoutCounterRespo
 		TradeId:        orderInfo.TradeId,
 		ActualAmount:   orderInfo.ActualAmount,
 		Token:          orderInfo.Token,
-		ExpirationTime: orderInfo.CreatedAt.AddMinutes(config.GetOrderExpirationTime()).TimestampWithMillisecond(),
+		ExpirationTime: orderInfo.CreatedAt.AddMinutes(config.GetOrderExpirationTime()).TimestampMilli(),
 		RedirectUrl:    orderInfo.RedirectUrl,
 	}
 	return resp, nil
