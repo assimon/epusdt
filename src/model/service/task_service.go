@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/assimon/luuu/config"
 	"github.com/spf13/viper"
 
 	"github.com/assimon/luuu/model/data"
@@ -139,7 +140,9 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		// 回调队列
 		orderCallbackQueue, _ := handle.NewOrderCallbackQueue(order)
 		orderNoticeMaxRetry := viper.GetInt("order_notice_max_retry")
-		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(orderNoticeMaxRetry))
+		mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(orderNoticeMaxRetry),
+			asynq.Retention(config.GetOrderExpirationTimeDuration()),
+		)
 		// mq.MClient.Enqueue(orderCallbackQueue, asynq.MaxRetry(5))
 		// 发送机器人消息
 		msgTpl := `
