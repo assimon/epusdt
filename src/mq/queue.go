@@ -2,6 +2,7 @@ package mq
 
 import (
 	"fmt"
+
 	"github.com/assimon/luuu/mq/handle"
 	"github.com/assimon/luuu/util/log"
 	"github.com/hibiken/asynq"

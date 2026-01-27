@@ -3,6 +3,7 @@ package handle
 import (
 	"context"
 	"errors"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/data"
 	"github.com/assimon/luuu/model/mdb"
@@ -21,7 +22,9 @@ func NewOrderCallbackQueue(order *mdb.Orders) (*asynq.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	return asynq.NewTask(QueueOrderCallback, payload), nil
+	return asynq.NewTask(QueueOrderCallback, payload,
+		asynq.Retention(config.GetOrderExpirationTimeDuration()),
+	), nil
 }
 
 func OrderCallbackHandle(ctx context.Context, t *asynq.Task) error {

@@ -3,6 +3,8 @@ FROM golang:alpine AS builder
 RUN apk add --no-cache --update git build-base
 ENV CGO_ENABLED=1
 WORKDIR /app
+COPY ./src/go.mod ./src/go.sum ./
+RUN go mod download
 
 COPY ./src .
 RUN  go mod tidy \
