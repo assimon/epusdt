@@ -8,9 +8,9 @@ cd /var/www/
 mkdir epusdt
 chmod 777 -R /var/www/epusdt
 cd epusdt
-wget  https://github.com/assimon/epusdt/releases/download/v0.0.2/epusdt_v0.0.2_Linux_x86_64.tar.gz
-tar -xzf epusdt_v0.0.2_Linux_x86_64.tar.gz
-rm epusdt_v0.0.2_Linux_x86_64.tar.gz
+wget  wget https://github.com/assimon/epusdt/releases/download/v0.0.3/epusdt_0.0.3_Linux_x86_64.tar.gz
+tar -xzf epusdt_0.0.3_Linux_x86_64.tar.gz
+rm rm epusdt_0.0.3_Linux_x86_64.tar.gz
 ```
 ## 2.导入Sql
 - 创建sql文件
@@ -169,6 +169,10 @@ order_expiration_time=10
 forced_usdt_rate=
 ```
 ⚠️注意：配置文件里面不认识的不要修改，留空即可，不会改又要瞎改，除非你对项目源代码很熟悉很有信心😁
+
+必填配置项：app_uri、mysql配置、redis配置、api_auth_token
+
+选填配置项：tg_bot_token、tg_manage
 ## 6、配置supervisor
 为了保证`Epusdt`常驻后台运行，我们需要配置`supervisor`来实现进程监听  
 ```bash
