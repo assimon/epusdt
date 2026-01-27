@@ -15,7 +15,7 @@ import (
 	"github.com/assimon/luuu/util/http_client"
 	"github.com/assimon/luuu/util/json"
 	"github.com/assimon/luuu/util/log"
-	"github.com/golang-module/carbon/v2"
+	"github.com/dromara/carbon/v2"
 	"github.com/gookit/goutil/stdutil"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
@@ -72,8 +72,8 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 		}
 	}()
 	client := http_client.GetHttpClient()
-	startTime := carbon.Now().AddHours(-24).TimestampWithMillisecond()
-	endTime := carbon.Now().TimestampWithMillisecond()
+	startTime := carbon.Now().AddHours(-24).TimestampMilli()
+	endTime := carbon.Now().TimestampMilli()
 	resp, err := client.R().SetQueryParams(map[string]string{
 		"sort":            "-timestamp",
 		"limit":           "50",
@@ -121,7 +121,7 @@ func Trc20CallBack(token string, wg *sync.WaitGroup) {
 			panic(err)
 		}
 		// 区块的确认时间必须在订单创建时间之后
-		createTime := order.CreatedAt.TimestampWithMillisecond()
+		createTime := order.CreatedAt.TimestampMilli()
 		if transfer.BlockTimestamp < createTime {
 			panic("Orders cannot actually be matched")
 		}

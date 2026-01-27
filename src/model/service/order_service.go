@@ -12,7 +12,7 @@ import (
 	"github.com/assimon/luuu/mq/handle"
 	"github.com/assimon/luuu/util/constant"
 	"github.com/assimon/luuu/util/math"
-	"github.com/golang-module/carbon/v2"
+	"github.com/dromara/carbon/v2"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
 	"math/rand"
