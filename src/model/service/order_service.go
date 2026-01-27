@@ -2,6 +2,10 @@ package service
 
 import (
 	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+
 	"github.com/assimon/luuu/config"
 	"github.com/assimon/luuu/model/dao"
 	"github.com/assimon/luuu/model/data"
@@ -15,9 +19,6 @@ import (
 	"github.com/dromara/carbon/v2"
 	"github.com/hibiken/asynq"
 	"github.com/shopspring/decimal"
-	"math/rand"
-	"sync"
-	"time"
 )
 
 const (
@@ -95,7 +96,9 @@ func CreateTransaction(req *request.CreateTransactionRequest) (*response.CreateT
 	tx.Commit()
 	// 超时过期消息队列
 	orderExpirationQueue, _ := handle.NewOrderExpirationQueue(order.TradeId)
-	mq.MClient.Enqueue(orderExpirationQueue, asynq.ProcessIn(config.GetOrderExpirationTimeDuration()))
+	mq.MClient.Enqueue(orderExpirationQueue, asynq.ProcessIn(config.GetOrderExpirationTimeDuration()),
+		asynq.Retention(config.GetOrderExpirationTimeDuration()),
+	)
 	ExpirationTime := carbon.Now().AddMinutes(config.GetOrderExpirationTime()).Timestamp()
 	resp := &response.CreateTransactionResponse{
 		TradeId:        order.TradeId,
